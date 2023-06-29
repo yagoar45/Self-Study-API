@@ -37,7 +37,13 @@ export class StudentRepository {
   }
 
   async findAll(): Promise<Student[]> {
-    return await this.prismaService.student.findMany({ skip: 0, take: 10 });
+    return await this.prismaService.student.findMany({
+      skip: 0,
+      take: 10,
+      include: {
+        lessons: true,
+      },
+    });
   }
 
   async findById(id: string): Promise<Student> {
@@ -45,12 +51,15 @@ export class StudentRepository {
       where: {
         studentId: id,
       },
+      include: {
+        lessons: true,
+      },
     });
 
-    return student ? student : null;
+    return student;
   }
 
-  private async studentIsInDb(id: string): Promise<boolean> {
+  async studentIsInDb(id: string): Promise<boolean> {
     const student = await this.prismaService.student.findUniqueOrThrow({
       where: {
         studentId: id,
